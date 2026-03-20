@@ -1,5 +1,3 @@
-io
-json
 zipfile
 joblib
 numpy
