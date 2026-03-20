@@ -1,4 +1,3 @@
-zipfile
 joblib
 numpy
 pandas
