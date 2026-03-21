@@ -358,7 +358,7 @@ status_df = pd.DataFrame(
     }
 )
 st.subheader("Estado de artefactos")
-st.dataframe(status_df, use_container_width=True)
+st.dataframe(status_df, width="stretch")
 
 with st.expander("Diagnostico de archivos locales", expanded=False):
     st.write("Si no aparecen artefactos arriba, revisa esta lista para copiar/pegar rutas manuales.")
@@ -366,7 +366,7 @@ with st.expander("Diagnostico de archivos locales", expanded=False):
     if candidate_df.empty:
         st.warning("No se encontraron .keras/.joblib en las rutas de busqueda locales.")
     else:
-        st.dataframe(candidate_df, use_container_width=True)
+        st.dataframe(candidate_df, width="stretch")
 
 if model_bytes is None or scaler_bytes is None or encoders_bytes is None:
     st.warning(
@@ -471,7 +471,7 @@ else:
         try:
             df_batch = pd.read_csv(uploaded_csv)
             st.write("Vista previa del CSV de entrada:")
-            st.dataframe(df_batch.head(20), use_container_width=True)
+            st.dataframe(df_batch.head(20), width="stretch")
         except Exception as exc:
             st.error(f"No pude leer el CSV: {exc}")
             st.stop()
@@ -484,7 +484,7 @@ else:
                 st.stop()
 
             st.success(f"Predicciones completadas: {len(result_df)} registros")
-            st.dataframe(result_df.head(50), use_container_width=True)
+            st.dataframe(result_df.head(50), width="stretch")
 
             csv_out = result_df.to_csv(index=False).encode("utf-8")
             st.download_button(
