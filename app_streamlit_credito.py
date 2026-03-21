@@ -1,5 +1,6 @@
 import io
 import json
+import os
 from pathlib import Path
 import zipfile
 
@@ -20,10 +21,10 @@ PROJECT_DIR = APP_DIR.parent
 
 
 DEFAULTS = {
-    "model": PROJECT_DIR / "modelo_credito.keras",
-    "scaler": PROJECT_DIR / "minmax_scaler.joblib",
-    "encoders": PROJECT_DIR / "label_encoders.joblib",
-    "pca": PROJECT_DIR / "pca_8_componentes.joblib",
+    "model": APP_DIR / "modelo_credito.keras",
+    "scaler": APP_DIR / "minmax_scaler.joblib",
+    "encoders": APP_DIR / "label_encoders.joblib",
+    "pca": APP_DIR / "pca_8_componentes.joblib",
 }
 
 DEFAULT_SEARCH_DIRS = [
@@ -32,6 +33,13 @@ DEFAULT_SEARCH_DIRS = [
     PROJECT_DIR / "notebook",
     Path.cwd(),
 ]
+
+ENABLE_USER_UPLOADS = os.getenv("ENABLE_USER_UPLOADS", "false").strip().lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
 
 
 @st.cache_resource
@@ -310,18 +318,31 @@ def predict_df(df_raw: pd.DataFrame, model, scaler, label_encoders, pca=None):
 
 with st.sidebar:
     st.header("Archivos del modelo")
-    st.write("Puedes subir archivos o dejar que la app busque rutas locales.")
+    if ENABLE_USER_UPLOADS:
+        st.write("Puedes subir archivos o dejar que la app busque rutas locales.")
+        model_file = st.file_uploader("Modelo Keras (.keras)", type=["keras"])
+        scaler_file = st.file_uploader("Scaler (.joblib)", type=["joblib"])
+        encoders_file = st.file_uploader("Label encoders (.joblib)", type=["joblib"])
+        pca_file = st.file_uploader("PCA opcional (.joblib)", type=["joblib"])
 
-    model_file = st.file_uploader("Modelo Keras (.keras)", type=["keras"])
-    scaler_file = st.file_uploader("Scaler (.joblib)", type=["joblib"])
-    encoders_file = st.file_uploader("Label encoders (.joblib)", type=["joblib"])
-    pca_file = st.file_uploader("PCA opcional (.joblib)", type=["joblib"])
-
-    st.markdown("Ruta local manual (opcional)")
-    model_path_txt = st.text_input("Ruta modelo", value="")
-    scaler_path_txt = st.text_input("Ruta scaler", value="")
-    encoders_path_txt = st.text_input("Ruta encoders", value="")
-    pca_path_txt = st.text_input("Ruta PCA", value="")
+        st.markdown("Ruta local manual (opcional)")
+        model_path_txt = st.text_input("Ruta modelo", value="")
+        scaler_path_txt = st.text_input("Ruta scaler", value="")
+        encoders_path_txt = st.text_input("Ruta encoders", value="")
+        pca_path_txt = st.text_input("Ruta PCA", value="")
+    else:
+        st.info(
+            "Modo despliegue: la app usa artefactos locales incluidos en el servidor. "
+            "Si necesitas habilitar cargas manuales, define ENABLE_USER_UPLOADS=true."
+        )
+        model_file = None
+        scaler_file = None
+        encoders_file = None
+        pca_file = None
+        model_path_txt = ""
+        scaler_path_txt = ""
+        encoders_path_txt = ""
+        pca_path_txt = ""
 
     use_pca = st.checkbox("Aplicar PCA si esta disponible", value=True)
 
