@@ -1,3 +1,4 @@
+standard-imghdr
 joblib
 numpy
 pandas
