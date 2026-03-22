@@ -450,21 +450,31 @@ st.markdown(
     """
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
-    :root {
-            --bank-ink: #0c1726;
+        :root {
             --bank-navy: #081a36;
-            --bank-blue: #103f75;
             --bank-gold: #cfa44b;
-            --bank-surface: #f8fbff;
-            --bank-card: #ffffff;
-            --bank-border: #d9e5f2;
-            --bank-muted: #4c607a;
-    }
-    html, body, [class*="css"] {
+            --bank-teal: #0f766e;
+            --bank-amber: #b45309;
+            --bank-red: #b91c1c;
+            --ui-text: var(--text-color, #0c1726);
+            --ui-bg: var(--background-color, #ffffff);
+            --ui-surface: var(--secondary-background-color, #f4f7fb);
+            --ui-border: rgba(120, 136, 158, 0.35);
+        }
+
+        html, body, [class*="css"] {
             font-family: 'Sora', sans-serif;
-            color: var(--bank-ink);
-    }
-        .stApp,
+            color: var(--ui-text);
+        }
+
+        .stApp {
+            background:
+                radial-gradient(circle at 85% 12%, rgba(207, 164, 75, 0.14) 0%, rgba(207, 164, 75, 0) 34%),
+                radial-gradient(circle at 12% 28%, rgba(16, 63, 117, 0.10) 0%, rgba(16, 63, 117, 0) 28%),
+                var(--ui-bg);
+            color: var(--ui-text);
+        }
+
         .stApp p,
         .stApp li,
         .stApp label,
@@ -474,9 +484,7 @@ st.markdown(
         .stApp h3,
         .stApp h4,
         .stApp h5,
-        .stApp h6 {
-            color: var(--bank-ink);
-        }
+        .stApp h6,
         [data-testid="stMarkdownContainer"] p,
         [data-testid="stMarkdownContainer"] li,
         [data-testid="stMarkdownContainer"] span,
@@ -485,26 +493,35 @@ st.markdown(
         [data-testid="stWidgetLabel"] span,
         [data-testid="stRadio"] label,
         [data-testid="stRadio"] div {
-            color: var(--bank-ink) !important;
+            color: var(--ui-text) !important;
         }
+
         .stCaption {
-            color: var(--bank-muted) !important;
+            color: var(--ui-text) !important;
+            opacity: 0.78;
         }
-    .stApp {
-            background:
-                radial-gradient(circle at 85% 12%, rgba(207, 164, 75, 0.16) 0%, rgba(207, 164, 75, 0) 34%),
-                radial-gradient(circle at 12% 28%, rgba(16, 63, 117, 0.10) 0%, rgba(16, 63, 117, 0) 28%),
-                var(--bank-surface);
-    }
-    .hero {
+
+        [data-testid="stSidebar"] {
+            background: var(--ui-surface);
+            border-right: 1px solid var(--ui-border);
+        }
+        [data-testid="stSidebar"] * {
+            color: var(--ui-text) !important;
+        }
+        [data-testid="stSidebar"] .stTextInput input,
+        [data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"],
+        [data-testid="stSidebar"] .stSelectbox input {
+            color: var(--ui-text) !important;
+        }
+
+        .hero {
             border-radius: 22px;
             padding: 1.35rem;
             background: var(--bank-navy);
-      color: white;
-            border: 1px solid rgba(207,164,75,0.55);
-            box-shadow: 0 14px 32px rgba(8,26,54,0.28);
-      margin-bottom: 1.2rem;
-    }
+            border: 1px solid rgba(207, 164, 75, 0.55);
+            box-shadow: 0 14px 32px rgba(8, 26, 54, 0.28);
+            margin-bottom: 1.2rem;
+        }
         .hero-badge {
             display: inline-block;
             padding: 0.35rem 0.6rem;
@@ -516,67 +533,79 @@ st.markdown(
             background: var(--bank-gold);
             margin-bottom: 0.7rem;
         }
-    .hero h1 {
-      margin: 0;
+        .hero h1 {
+            margin: 0;
             font-family: 'Fraunces', serif;
             font-size: 2.25rem;
-      line-height: 1.1;
+            line-height: 1.1;
             color: #ffffff !important;
-    }
-    .hero p {
-      margin-top: 0.5rem;
-      margin-bottom: 0;
+        }
+        .hero p {
+            margin-top: 0.5rem;
+            margin-bottom: 0;
             color: #eaf2ff !important;
             font-size: 0.99rem;
             max-width: 42rem;
-    }
-    .section-card {
-            background: var(--bank-card);
-            border: 1px solid var(--bank-border);
-      border-radius: 16px;
+        }
+        [data-testid="stMarkdownContainer"] .hero,
+        [data-testid="stMarkdownContainer"] .hero *,
+        [data-testid="stMarkdownContainer"] .hero .hero-badge,
+        [data-testid="stMarkdownContainer"] .hero h1,
+        [data-testid="stMarkdownContainer"] .hero p {
+            color: #ffffff !important;
+        }
+
+        .section-card {
+            background: var(--ui-surface);
+            border: 1px solid var(--ui-border);
+            border-radius: 16px;
             padding: 1.1rem;
-            box-shadow: 0 10px 24px rgba(16,63,117,0.10);
-      margin-bottom: 1rem;
-    }
-    .result-card {
-      border-radius: 16px;
-      padding: 1rem;
-            color: var(--bank-ink);
-            box-shadow: 0 10px 24px rgba(15,23,42,0.12);
-            border: 1px solid var(--bank-border);
-            background: #ffffff;
+            box-shadow: 0 10px 24px rgba(16, 63, 117, 0.10);
+            margin-bottom: 1rem;
+        }
+
+        .result-card {
+            border-radius: 16px;
+            padding: 1rem;
+            color: var(--ui-text);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+            border: 1px solid var(--ui-border);
+            background: var(--ui-surface);
             margin-bottom: 0.6rem;
         }
         .result-card h3 {
             margin: 0;
             font-family: 'Fraunces', serif;
             font-size: 1.4rem;
-            color: var(--bank-ink);
+            color: var(--ui-text) !important;
         }
         .result-card p {
             margin: 0.45rem 0 0 0;
-            color: #334155;
+            color: var(--ui-text) !important;
+            opacity: 0.9;
         }
+
         .outcome-alto {
-            border-left: 10px solid #0f766e;
-            background: #ecfeff;
+            border-left: 10px solid var(--bank-teal);
+            background: rgba(15, 118, 110, 0.12);
         }
         .outcome-medio {
-            border-left: 10px solid #b45309;
-            background: #fff7ed;
+            border-left: 10px solid var(--bank-amber);
+            background: rgba(180, 83, 9, 0.12);
         }
         .outcome-bajo {
-            border-left: 10px solid #b91c1c;
-            background: #fef2f2;
-    }
-    .prob-chip {
-            background: #f2f7fd;
-      border-radius: 12px;
-            border: 1px solid #d4e2f1;
-      padding: 0.65rem 0.8rem;
-      margin-bottom: 0.5rem;
-            color: var(--bank-ink);
-    }
+            border-left: 10px solid var(--bank-red);
+            background: rgba(185, 28, 28, 0.12);
+        }
+
+        .prob-chip {
+            background: var(--ui-surface);
+            border-radius: 12px;
+            border: 1px solid var(--ui-border);
+            padding: 0.65rem 0.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--ui-text);
+        }
     </style>
     """,
     unsafe_allow_html=True,
