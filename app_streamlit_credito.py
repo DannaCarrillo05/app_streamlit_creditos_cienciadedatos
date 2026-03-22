@@ -21,7 +21,7 @@ PROJECT_DIR = APP_DIR.parent
 
 
 DEFAULTS = {
-    "model": APP_DIR / "modelo_credito.keras",
+    "model": APP_DIR / "modelo_credito_pca8.keras",
     "scaler": APP_DIR / "minmax_scaler.joblib",
     "encoders": APP_DIR / "label_encoders.joblib",
     "pca": APP_DIR / "pca_8_componentes.joblib",
