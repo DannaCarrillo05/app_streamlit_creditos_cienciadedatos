@@ -833,7 +833,6 @@ if mode == "Evaluacion individual":
             unsafe_allow_html=True,
         )
         st.image(theme["image"], width="stretch")
-        st.caption("Puedes cambiar las URLs de RESULT_IMAGE_URLS para usar imagenes propias por cada resultado.")
 
         st.markdown("### Probabilidad por categoria")
         prob_cols = [c for c in pred_df.columns if c.startswith("prob_class_")]
