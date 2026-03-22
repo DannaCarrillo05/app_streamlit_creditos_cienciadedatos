@@ -358,6 +358,7 @@ def humanize_option(value: str) -> str:
         "nm": "No informado",
         "yes": "Si",
         "no": "No",
+        "bad": "Malo",
         "good": "Alto",
         "standard": "Medio",
         "poor": "Bajo",
@@ -511,7 +512,7 @@ st.markdown(
             font-size: 0.76rem;
             font-weight: 700;
             letter-spacing: 0.03em;
-            color: #2f2200;
+            color: #ffffff !important;
             background: var(--bank-gold);
             margin-bottom: 0.7rem;
         }
