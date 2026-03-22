@@ -754,12 +754,12 @@ if mode == "Evaluacion individual":
                     if num_format in ("%.0f", "%d"):
                         min_input = int(np.floor(min_train))
                         max_input = int(np.ceil(max_train))
-                        default_input = int(round((min_input + max_input) / 2))
+                        default_input = min_input
                         step_input = int(max(1, round(num_step)))
                     else:
                         min_input = float(min_train)
                         max_input = float(max_train)
-                        default_input = float((min_input + max_input) / 2.0)
+                        default_input = min_input
                         step_input = float(num_step)
 
                     row_dict[col] = st.number_input(
