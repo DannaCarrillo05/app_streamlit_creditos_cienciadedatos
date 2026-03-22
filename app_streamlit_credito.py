@@ -418,31 +418,54 @@ def get_numeric_format(col_name: str):
     return "%.2f", 0.1
 
 
-def build_numeric_limits_from_scaler(scaler, numeric_features):
-    if not hasattr(scaler, "feature_names_in_") or not hasattr(scaler, "data_min_") or not hasattr(scaler, "data_max_"):
-        return {}, pd.DataFrame(columns=["campo", "minimo_entrenamiento", "maximo_entrenamiento"])
+def original_feature_bounds_from_scaler(scaler, feature_name: str):
+    if not hasattr(scaler, "feature_names_in_"):
+        return None
 
     feature_names = list(scaler.feature_names_in_)
-    data_min = list(scaler.data_min_)
-    data_max = list(scaler.data_max_)
     idx_map = {name: i for i, name in enumerate(feature_names)}
+    idx = idx_map.get(feature_name)
+    if idx is None:
+        return None
+
+    # Prefer direct observed bounds when available.
+    if hasattr(scaler, "data_min_") and hasattr(scaler, "data_max_"):
+        min_val = float(scaler.data_min_[idx])
+        max_val = float(scaler.data_max_[idx])
+    # Fallback: invert scaler transform endpoints to recover original-space bounds.
+    elif hasattr(scaler, "scale_") and hasattr(scaler, "min_") and hasattr(scaler, "feature_range"):
+        scale_val = float(scaler.scale_[idx])
+        offset_val = float(scaler.min_[idx])
+        fr_min, fr_max = scaler.feature_range
+        if not np.isfinite(scale_val) or abs(scale_val) < 1e-12:
+            return None
+        min_val = (float(fr_min) - offset_val) / scale_val
+        max_val = (float(fr_max) - offset_val) / scale_val
+    else:
+        return None
+
+    if not np.isfinite(min_val) or not np.isfinite(max_val):
+        return None
+
+    if min_val > max_val:
+        min_val, max_val = max_val, min_val
+
+    return min_val, max_val
+
+
+def build_numeric_limits_from_scaler(scaler, numeric_features):
+    if not hasattr(scaler, "feature_names_in_"):
+        return {}, pd.DataFrame(columns=["campo", "minimo_entrenamiento", "maximo_entrenamiento"])
 
     limits = {}
     rows = []
 
     for col in numeric_features:
-        idx = idx_map.get(col)
-        if idx is None:
+        bounds = original_feature_bounds_from_scaler(scaler, col)
+        if bounds is None:
             continue
 
-        min_val = float(data_min[idx])
-        max_val = float(data_max[idx])
-
-        if not np.isfinite(min_val) or not np.isfinite(max_val):
-            continue
-
-        if min_val > max_val:
-            min_val, max_val = max_val, min_val
+        min_val, max_val = bounds
 
         limits[col] = (min_val, max_val)
         rows.append(
@@ -754,13 +777,19 @@ if mode == "Evaluacion individual":
                     if num_format in ("%.0f", "%d"):
                         min_input = int(np.floor(min_train))
                         max_input = int(np.ceil(max_train))
+                        if max_input <= min_input:
+                            max_input = min_input + 1
                         default_input = min_input
                         step_input = int(max(1, round(num_step)))
                     else:
-                        min_input = float(min_train)
-                        max_input = float(max_train)
-                        default_input = min_input
+                        # Para la UI usamos limites redondeados hacia afuera:
+                        # minimo con floor y maximo con ceil.
+                        min_input = float(np.floor(min_train))
+                        max_input = float(np.ceil(max_train))
                         step_input = float(num_step)
+                        if max_input <= min_input:
+                            max_input = min_input + step_input
+                        default_input = min_input
 
                     row_dict[col] = st.number_input(
                         label,
