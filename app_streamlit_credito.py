@@ -380,23 +380,20 @@ def outcome_theme(label: str):
         return {
             "titulo": "Perfil crediticio alto",
             "descripcion": "Excelente posicion para acceder a mejores condiciones.",
-            "color": "#0f766e",
-            "accent": "#14b8a6",
+            "class": "outcome-alto",
             "image": RESULT_IMAGE_URLS["alto"],
         }
     if "standard" in low or "medio" in low:
         return {
             "titulo": "Perfil crediticio medio",
             "descripcion": "Perfil estable con margen para mejorar condiciones.",
-            "color": "#b45309",
-            "accent": "#f59e0b",
+            "class": "outcome-medio",
             "image": RESULT_IMAGE_URLS["medio"],
         }
     return {
         "titulo": "Perfil crediticio bajo",
         "descripcion": "Riesgo alto: conviene fortalecer ingresos y habitos de pago.",
-        "color": "#b91c1c",
-        "accent": "#ef4444",
+        "class": "outcome-bajo",
         "image": RESULT_IMAGE_URLS["bajo"],
     }
 
@@ -404,62 +401,106 @@ def outcome_theme(label: str):
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Spectral:wght@600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
     :root {
-      --bank-navy: #06213a;
-      --bank-blue: #0d4f8b;
-      --bank-gold: #d4a53a;
-      --bank-cloud: #f3f7fb;
-      --bank-text: #0d1b2a;
+            --bank-ink: #0c1726;
+            --bank-navy: #081a36;
+            --bank-blue: #103f75;
+            --bank-gold: #cfa44b;
+            --bank-surface: #f8fbff;
+            --bank-card: #ffffff;
+            --bank-border: #d9e5f2;
+            --bank-muted: #4c607a;
     }
     html, body, [class*="css"] {
-      font-family: 'Manrope', sans-serif;
-      color: var(--bank-text);
+            font-family: 'Sora', sans-serif;
+            color: var(--bank-ink);
     }
     .stApp {
-      background: radial-gradient(circle at 10% 10%, #dcecff 0%, #f4f8fc 35%, #ffffff 70%);
+            background:
+                radial-gradient(circle at 85% 12%, rgba(207, 164, 75, 0.16) 0%, rgba(207, 164, 75, 0) 34%),
+                radial-gradient(circle at 12% 28%, rgba(16, 63, 117, 0.10) 0%, rgba(16, 63, 117, 0) 28%),
+                var(--bank-surface);
     }
     .hero {
-      border-radius: 22px;
-      padding: 1.25rem;
-      background: linear-gradient(125deg, rgba(6,33,58,0.95), rgba(13,79,139,0.90));
+            border-radius: 22px;
+            padding: 1.35rem;
+            background: var(--bank-navy);
       color: white;
-      border: 1px solid rgba(212,165,58,0.45);
-      box-shadow: 0 18px 40px rgba(6,33,58,0.25);
+            border: 1px solid rgba(207,164,75,0.55);
+            box-shadow: 0 14px 32px rgba(8,26,54,0.28);
       margin-bottom: 1.2rem;
     }
+        .hero-badge {
+            display: inline-block;
+            padding: 0.35rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            color: #2f2200;
+            background: var(--bank-gold);
+            margin-bottom: 0.7rem;
+        }
     .hero h1 {
       margin: 0;
-      font-family: 'Spectral', serif;
-      font-size: 2.2rem;
+            font-family: 'Fraunces', serif;
+            font-size: 2.25rem;
       line-height: 1.1;
     }
     .hero p {
       margin-top: 0.5rem;
       margin-bottom: 0;
-      opacity: 0.95;
-      font-size: 1rem;
+            color: #d8e4f3;
+            font-size: 0.99rem;
+            max-width: 42rem;
     }
     .section-card {
-      background: white;
-      border: 1px solid #e3ecf4;
+            background: var(--bank-card);
+            border: 1px solid var(--bank-border);
       border-radius: 16px;
-      padding: 1rem;
-      box-shadow: 0 10px 25px rgba(13,79,139,0.10);
+            padding: 1.1rem;
+            box-shadow: 0 10px 24px rgba(16,63,117,0.10);
       margin-bottom: 1rem;
     }
     .result-card {
       border-radius: 16px;
       padding: 1rem;
-      color: white;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+            color: var(--bank-ink);
+            box-shadow: 0 10px 24px rgba(15,23,42,0.12);
+            border: 1px solid var(--bank-border);
+            background: #ffffff;
+            margin-bottom: 0.6rem;
+        }
+        .result-card h3 {
+            margin: 0;
+            font-family: 'Fraunces', serif;
+            font-size: 1.4rem;
+            color: var(--bank-ink);
+        }
+        .result-card p {
+            margin: 0.45rem 0 0 0;
+            color: #334155;
+        }
+        .outcome-alto {
+            border-left: 10px solid #0f766e;
+            background: #ecfeff;
+        }
+        .outcome-medio {
+            border-left: 10px solid #b45309;
+            background: #fff7ed;
+        }
+        .outcome-bajo {
+            border-left: 10px solid #b91c1c;
+            background: #fef2f2;
     }
     .prob-chip {
-      background: #eef4fb;
+            background: #f2f7fd;
       border-radius: 12px;
-      border: 1px solid #d6e4f2;
+            border: 1px solid #d4e2f1;
       padding: 0.65rem 0.8rem;
       margin-bottom: 0.5rem;
+            color: var(--bank-ink);
     }
     </style>
     """,
@@ -529,6 +570,7 @@ with col_hero_text:
     st.markdown(
         """
         <div class="hero">
+                    <span class="hero-badge">PREAPROBACION DIGITAL</span>
           <h1>PulseBank<br/>Score de Credito Inteligente</h1>
           <p>Simula en segundos la categoria de perfil crediticio con una experiencia clara, humana y 100% en espanol.</p>
         </div>
@@ -585,9 +627,9 @@ if mode == "Evaluacion individual":
 
         st.markdown(
             f"""
-            <div class="result-card" style="background: linear-gradient(120deg, {theme['color']}, {theme['accent']});">
-              <h3 style="margin:0;">{theme['titulo']}</h3>
-              <p style="margin:0.5rem 0 0 0;">{theme['descripcion']}</p>
+                        <div class="result-card {theme['class']}">
+                            <h3>{theme['titulo']}</h3>
+                            <p>{theme['descripcion']}</p>
             </div>
             """,
             unsafe_allow_html=True,
