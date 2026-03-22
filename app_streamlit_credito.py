@@ -1,6 +1,5 @@
 import io
 import json
-import os
 from pathlib import Path
 import zipfile
 
@@ -31,12 +30,9 @@ DEFAULT_SEARCH_DIRS = [
     Path.cwd(),
 ]
 
-ENABLE_USER_UPLOADS = os.getenv("ENABLE_USER_UPLOADS", "false").strip().lower() in {
-    "1",
-    "true",
-    "yes",
-    "on",
-}
+# Feature flags de UI (ajusta estos valores directamente en despliegue)
+ENABLE_USER_UPLOADS = False
+SHOW_TRAINING_RANGES = False
 
 
 @st.cache_resource
@@ -418,7 +414,7 @@ def get_numeric_format(col_name: str):
     int_hint = ["num", "count", "age", "dias", "delay", "loan", "accounts", "card", "inquiries"]
     low = col_name.lower()
     if any(h in low for h in int_hint):
-        return "%.0f", 1.0
+        return "%d", 1
     return "%.2f", 0.1
 
 
@@ -727,11 +723,12 @@ with col_hero_img:
 
 mode = st.radio("Selecciona una opcion", ["Evaluacion individual", "Evaluacion por archivo"], horizontal=True)
 
-with st.expander("Rangos permitidos por campo (segun entrenamiento)", expanded=False):
-    if training_ranges_df.empty:
-        st.info("No fue posible inferir rangos numericos desde el scaler.")
-    else:
-        st.dataframe(training_ranges_df, width="stretch")
+if SHOW_TRAINING_RANGES:
+    with st.expander("Rangos permitidos por campo (segun entrenamiento)", expanded=False):
+        if training_ranges_df.empty:
+            st.info("No fue posible inferir rangos numericos desde el scaler.")
+        else:
+            st.dataframe(training_ranges_df, width="stretch")
 
 if mode == "Evaluacion individual":
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
@@ -754,7 +751,7 @@ if mode == "Evaluacion individual":
                 num_format, num_step = get_numeric_format(col)
                 if col in numeric_limits:
                     min_train, max_train = numeric_limits[col]
-                    if num_format == "%.0f":
+                    if num_format in ("%.0f", "%d"):
                         min_input = int(np.floor(min_train))
                         max_input = int(np.ceil(max_train))
                         default_input = int(round((min_input + max_input) / 2))
