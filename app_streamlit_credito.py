@@ -344,7 +344,8 @@ with st.sidebar:
         encoders_path_txt = ""
         pca_path_txt = ""
 
-    use_pca = st.checkbox("Aplicar PCA si esta disponible", value=True)
+    use_pca = True
+    st.caption("Modo PCA obligatorio: la inferencia aplica PCA antes del modelo.")
 
 model_bytes, model_source = resolve_artifact_bytes(model_file, DEFAULTS["model"], model_path_txt)
 scaler_bytes, scaler_source = resolve_artifact_bytes(scaler_file, DEFAULTS["scaler"], scaler_path_txt)
@@ -384,27 +385,18 @@ except Exception as exc:
     st.error(f"No fue posible cargar artefactos: {exc}")
     st.stop()
 
+if pca is None:
+    st.error(
+        "No se encontro PCA, pero esta app requiere inferencia con PCA. "
+        "Incluye 'pca_8_componentes.joblib' del mismo entrenamiento que produjo el modelo."
+    )
+    st.stop()
+
 st.success("Artefactos cargados correctamente")
 
 n_scaler_features = len(getattr(scaler, "feature_names_in_", []))
 model_input_dim = model.input_shape[-1]
 pca_dim = pca.n_components_ if pca is not None else None
-
-# Autoajuste de PCA para evitar bloquear la app por incompatibilidad frecuente.
-if pca is not None and model_input_dim == n_scaler_features and model_input_dim != pca_dim:
-    pca = None
-    st.warning(
-        "Se detecto incompatibilidad de dimensiones con PCA activo. "
-        "La app desactivo PCA automaticamente porque el modelo fue entrenado con features sin PCA."
-    )
-elif pca is None and pca_bytes is not None and model_input_dim != n_scaler_features:
-    try:
-        pca_candidate = load_pickle(pca_bytes)
-        if getattr(pca_candidate, "n_components_", None) == model_input_dim:
-            pca = pca_candidate
-            st.info("La app activo PCA automaticamente para coincidir con las dimensiones del modelo.")
-    except Exception:
-        pass
 
 is_compatible, compatibility_msg, _ = validate_pipeline_dimensions(model, scaler, pca)
 if not is_compatible:
