@@ -536,7 +536,7 @@ with col_hero_text:
         unsafe_allow_html=True,
     )
 with col_hero_img:
-    st.image(HERO_IMAGE_URL, use_container_width=True)
+    st.image(HERO_IMAGE_URL, width="stretch")
     st.caption("Reemplaza HERO_IMAGE_URL con tu URL de imagen corporativa.")
 
 mode = st.radio("Selecciona una opcion", ["Evaluacion individual", "Evaluacion por archivo"], horizontal=True)
@@ -569,7 +569,7 @@ if mode == "Evaluacion individual":
                     key=f"single_{idx}_{col}",
                 )
 
-    evaluar = st.button("Evaluar perfil crediticio", type="primary", use_container_width=True)
+    evaluar = st.button("Evaluar perfil crediticio", type="primary", width="stretch")
     st.markdown("</div>", unsafe_allow_html=True)
 
     if evaluar:
@@ -592,7 +592,7 @@ if mode == "Evaluacion individual":
             """,
             unsafe_allow_html=True,
         )
-        st.image(theme["image"], use_container_width=True)
+        st.image(theme["image"], width="stretch")
         st.caption("Puedes cambiar las URLs de RESULT_IMAGE_URLS para usar imagenes propias por cada resultado.")
 
         st.markdown("### Probabilidad por categoria")
@@ -634,7 +634,7 @@ else:
             st.error("No fue posible leer el archivo. Verifica que sea un CSV valido.")
             st.stop()
 
-        if st.button("Evaluar archivo", type="primary", use_container_width=True):
+        if st.button("Evaluar archivo", type="primary", width="stretch"):
             try:
                 result_df, _, _, _ = predict_df(df_batch, model, scaler, label_encoders, pca)
             except Exception:
@@ -654,7 +654,7 @@ else:
                 data=csv_out,
                 file_name="resultados_perfil_crediticio.csv",
                 mime="text/csv",
-                use_container_width=True,
+                width="stretch",
             )
 
     st.markdown("</div>", unsafe_allow_html=True)
