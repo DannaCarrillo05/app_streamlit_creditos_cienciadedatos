@@ -758,17 +758,19 @@ if mode == "Evaluacion individual":
                         min_input = int(np.floor(min_train))
                         max_input = int(np.ceil(max_train))
                         default_input = int(round((min_input + max_input) / 2))
+                        step_input = int(max(1, round(num_step)))
                     else:
                         min_input = float(min_train)
                         max_input = float(max_train)
                         default_input = float((min_input + max_input) / 2.0)
+                        step_input = float(num_step)
 
                     row_dict[col] = st.number_input(
                         label,
                         min_value=min_input,
                         max_value=max_input,
                         value=default_input,
-                        step=num_step,
+                        step=step_input,
                         format=num_format,
                         key=f"single_{idx}_{col}",
                     )
