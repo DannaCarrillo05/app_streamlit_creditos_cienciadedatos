@@ -416,6 +416,32 @@ st.markdown(
             font-family: 'Sora', sans-serif;
             color: var(--bank-ink);
     }
+        .stApp,
+        .stApp p,
+        .stApp li,
+        .stApp label,
+        .stApp span,
+        .stApp h1,
+        .stApp h2,
+        .stApp h3,
+        .stApp h4,
+        .stApp h5,
+        .stApp h6 {
+            color: var(--bank-ink);
+        }
+        [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMarkdownContainer"] li,
+        [data-testid="stMarkdownContainer"] span,
+        [data-testid="stCaptionContainer"] p,
+        [data-testid="stWidgetLabel"] p,
+        [data-testid="stWidgetLabel"] span,
+        [data-testid="stRadio"] label,
+        [data-testid="stRadio"] div {
+            color: var(--bank-ink) !important;
+        }
+        .stCaption {
+            color: var(--bank-muted) !important;
+        }
     .stApp {
             background:
                 radial-gradient(circle at 85% 12%, rgba(207, 164, 75, 0.16) 0%, rgba(207, 164, 75, 0) 34%),
