@@ -10,7 +10,7 @@ import pandas as pd
 import streamlit as st
 
 
-st.set_page_config(page_title="PulseBank | Perfil Crediticio", page_icon="🏦", layout="wide")
+st.set_page_config(page_title="BrumaFirme Financiera | Perfil Crediticio", page_icon="🏦", layout="wide")
 
 
 APP_DIR = Path(__file__).resolve().parent
@@ -351,19 +351,66 @@ def humanize_feature_name(name: str) -> str:
 
 
 def humanize_option(value: str) -> str:
-    base = str(value).replace("_", " ").strip()
-    replacements = {
+    original = str(value).strip()
+    low = original.lower()
+
+    exact_map = {
         "nm": "No informado",
         "yes": "Si",
         "no": "No",
         "good": "Alto",
         "standard": "Medio",
         "poor": "Bajo",
+        "high_spent_small_value_payments": "Gasto alto y pagos pequenos",
+        "high_spent_medium_value_payments": "Gasto alto y pagos medianos",
+        "high_spent_large_value_payments": "Gasto alto y pagos altos",
+        "low_spent_small_value_payments": "Gasto bajo y pagos pequenos",
+        "low_spent_medium_value_payments": "Gasto bajo y pagos medianos",
+        "low_spent_large_value_payments": "Gasto bajo y pagos altos",
     }
-    low = base.lower()
-    if low in replacements:
-        return replacements[low]
-    return base.capitalize()
+    if low in exact_map:
+        return exact_map[low]
+
+    token_map = {
+        "high": "alto",
+        "low": "bajo",
+        "medium": "medio",
+        "spent": "gasto",
+        "small": "pequenos",
+        "large": "altos",
+        "value": "valor",
+        "payments": "pagos",
+        "payment": "pago",
+        "mix": "mezcla",
+        "credit": "credito",
+        "history": "historial",
+        "amount": "monto",
+        "minimum": "minimo",
+        "monthly": "mensual",
+        "balance": "balance",
+        "behavior": "comportamiento",
+        "behaviour": "comportamiento",
+        "unknown": "no informado",
+    }
+
+    tokens = low.replace("-", "_").split("_")
+    translated = [token_map.get(tok, tok) for tok in tokens if tok]
+    if not translated:
+        return original
+    sentence = " ".join(translated)
+    return sentence.capitalize()
+
+
+def build_display_mapping(raw_options):
+    display_to_raw = {}
+    display_options = []
+    for raw in raw_options:
+        label = humanize_option(raw)
+        if label in display_to_raw:
+            label = f"{label} ({raw})"
+        display_to_raw[label] = raw
+        display_options.append(label)
+    return display_options, display_to_raw
 
 
 def get_numeric_format(col_name: str):
@@ -473,11 +520,12 @@ st.markdown(
             font-family: 'Fraunces', serif;
             font-size: 2.25rem;
       line-height: 1.1;
+            color: #ffffff !important;
     }
     .hero p {
       margin-top: 0.5rem;
       margin-bottom: 0;
-            color: #d8e4f3;
+            color: #eaf2ff !important;
             font-size: 0.99rem;
             max-width: 42rem;
     }
@@ -535,7 +583,7 @@ st.markdown(
 
 
 with st.sidebar:
-    st.markdown("### PulseBank")
+    st.markdown("### BrumaFirme Financiera")
     st.caption("Simulador de perfil crediticio")
     if ENABLE_USER_UPLOADS:
         with st.expander("Configuracion interna", expanded=False):
@@ -597,15 +645,14 @@ with col_hero_text:
         """
         <div class="hero">
                     <span class="hero-badge">PREAPROBACION DIGITAL</span>
-          <h1>PulseBank<br/>Score de Credito Inteligente</h1>
-          <p>Simula en segundos la categoria de perfil crediticio con una experiencia clara, humana y 100% en espanol.</p>
+                    <h1>BrumaFirme Financiera<br/>Score de Credito Inteligente</h1>
+          <p>Esta simulacion orientativa estima el perfil crediticio de una solicitud y ayuda a identificar opciones financieras acordes al nivel de riesgo.</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 with col_hero_img:
     st.image(HERO_IMAGE_URL, width="stretch")
-    st.caption("Reemplaza HERO_IMAGE_URL con tu URL de imagen corporativa.")
 
 mode = st.radio("Selecciona una opcion", ["Evaluacion individual", "Evaluacion por archivo"], horizontal=True)
 
@@ -623,8 +670,7 @@ if mode == "Evaluacion individual":
             label = humanize_feature_name(col)
             if col in categorical_features:
                 raw_opts = list(map(str, label_encoders[col].classes_))
-                display_opts = [humanize_option(x) for x in raw_opts]
-                display_to_raw = dict(zip(display_opts, raw_opts))
+                display_opts, display_to_raw = build_display_mapping(raw_opts)
                 selected_display = st.selectbox(label, display_opts, key=f"single_{idx}_{col}")
                 row_dict[col] = display_to_raw[selected_display]
             else:
@@ -728,4 +774,4 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("---")
-st.caption("PulseBank Analytics | Simulador de perfil crediticio")
+st.caption("BrumaFirme Analytics | Simulador de perfil crediticio")
