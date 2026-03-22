@@ -422,6 +422,45 @@ def get_numeric_format(col_name: str):
     return "%.2f", 0.1
 
 
+def build_numeric_limits_from_scaler(scaler, numeric_features):
+    if not hasattr(scaler, "feature_names_in_") or not hasattr(scaler, "data_min_") or not hasattr(scaler, "data_max_"):
+        return {}, pd.DataFrame(columns=["campo", "minimo_entrenamiento", "maximo_entrenamiento"])
+
+    feature_names = list(scaler.feature_names_in_)
+    data_min = list(scaler.data_min_)
+    data_max = list(scaler.data_max_)
+    idx_map = {name: i for i, name in enumerate(feature_names)}
+
+    limits = {}
+    rows = []
+
+    for col in numeric_features:
+        idx = idx_map.get(col)
+        if idx is None:
+            continue
+
+        min_val = float(data_min[idx])
+        max_val = float(data_max[idx])
+
+        if not np.isfinite(min_val) or not np.isfinite(max_val):
+            continue
+
+        if min_val > max_val:
+            min_val, max_val = max_val, min_val
+
+        limits[col] = (min_val, max_val)
+        rows.append(
+            {
+                "campo": humanize_feature_name(col),
+                "minimo_entrenamiento": np.round(min_val, 4),
+                "maximo_entrenamiento": np.round(max_val, 4),
+            }
+        )
+
+    ranges_df = pd.DataFrame(rows)
+    return limits, ranges_df
+
+
 def outcome_theme(label: str):
     low = str(label).strip().lower()
     if "good" in low or "alto" in low:
@@ -669,6 +708,8 @@ except Exception:
     st.error("No fue posible cargar la estructura de evaluacion. Intenta nuevamente en unos minutos.")
     st.stop()
 
+numeric_limits, training_ranges_df = build_numeric_limits_from_scaler(scaler, numeric_features)
+
 col_hero_text, col_hero_img = st.columns([1.5, 1])
 with col_hero_text:
     st.markdown(
@@ -685,6 +726,12 @@ with col_hero_img:
     st.image(HERO_IMAGE_URL, width="stretch")
 
 mode = st.radio("Selecciona una opcion", ["Evaluacion individual", "Evaluacion por archivo"], horizontal=True)
+
+with st.expander("Rangos permitidos por campo (segun entrenamiento)", expanded=False):
+    if training_ranges_df.empty:
+        st.info("No fue posible inferir rangos numericos desde el scaler.")
+    else:
+        st.dataframe(training_ranges_df, width="stretch")
 
 if mode == "Evaluacion individual":
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
@@ -705,13 +752,34 @@ if mode == "Evaluacion individual":
                 row_dict[col] = display_to_raw[selected_display]
             else:
                 num_format, num_step = get_numeric_format(col)
-                row_dict[col] = st.number_input(
-                    label,
-                    value=0.0,
-                    step=num_step,
-                    format=num_format,
-                    key=f"single_{idx}_{col}",
-                )
+                if col in numeric_limits:
+                    min_train, max_train = numeric_limits[col]
+                    if num_format == "%.0f":
+                        min_input = int(np.floor(min_train))
+                        max_input = int(np.ceil(max_train))
+                        default_input = int(round((min_input + max_input) / 2))
+                    else:
+                        min_input = float(min_train)
+                        max_input = float(max_train)
+                        default_input = float((min_input + max_input) / 2.0)
+
+                    row_dict[col] = st.number_input(
+                        label,
+                        min_value=min_input,
+                        max_value=max_input,
+                        value=default_input,
+                        step=num_step,
+                        format=num_format,
+                        key=f"single_{idx}_{col}",
+                    )
+                else:
+                    row_dict[col] = st.number_input(
+                        label,
+                        value=0.0,
+                        step=num_step,
+                        format=num_format,
+                        key=f"single_{idx}_{col}",
+                    )
 
     evaluar = st.button("Evaluar perfil crediticio", type="primary", width="stretch")
     st.markdown("</div>", unsafe_allow_html=True)
