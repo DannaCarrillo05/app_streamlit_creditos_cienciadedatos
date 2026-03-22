@@ -557,7 +557,7 @@ if mode == "Evaluacion individual":
                 raw_opts = list(map(str, label_encoders[col].classes_))
                 display_opts = [humanize_option(x) for x in raw_opts]
                 display_to_raw = dict(zip(display_opts, raw_opts))
-                selected_display = st.selectbox(label, display_opts, key=f"single_{col}")
+                selected_display = st.selectbox(label, display_opts, key=f"single_{idx}_{col}")
                 row_dict[col] = display_to_raw[selected_display]
             else:
                 num_format, num_step = get_numeric_format(col)
@@ -566,7 +566,7 @@ if mode == "Evaluacion individual":
                     value=0.0,
                     step=num_step,
                     format=num_format,
-                    key=f"single_{col}",
+                    key=f"single_{idx}_{col}",
                 )
 
     evaluar = st.button("Evaluar perfil crediticio", type="primary", use_container_width=True)
